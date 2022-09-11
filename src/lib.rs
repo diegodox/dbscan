@@ -1,5 +1,6 @@
 //! Reference: https://github.com/lazear/dbscan which licenced under MIT Licence
 
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct DBScan<F> {
     epsilon: F,
     min: usize,
