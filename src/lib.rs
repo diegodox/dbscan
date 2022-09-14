@@ -1,6 +1,7 @@
 //! Reference: https://github.com/lazear/dbscan which licenced under MIT Licence
 
 mod nd;
+mod oned;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct DBScan<F> {
@@ -19,6 +20,17 @@ impl<F: PartialOrd> DBScan<F> {
     {
         nd::DBScanRunner::new(self, data, distance).classify()
     }
+
+    pub fn classify1d<T, DistFn>(
+        &self,
+        data: &[T],
+        distance: DistFn,
+    ) -> Result<Vec<Class>, DBScanError>
+    where
+        DistFn: Fn(&T, &T) -> F,
+        T: PartialOrd,
+    {
+        oned::DBScanRunner::new(self, data, distance).map(|x| x.classify())
     }
 }
 
@@ -39,7 +51,7 @@ pub enum Class {
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct ClassId(pub usize);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 struct DataIdx(usize);
 impl<T> std::ops::Index<DataIdx> for [T] {
     type Output = T;
@@ -66,4 +78,7 @@ impl<T> std::ops::IndexMut<DataIdx> for Vec<T> {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum DBScanError {
+    DataIsNotSorted,
 }
