@@ -34,12 +34,10 @@ where
     F: PartialOrd,
 {
     pub(crate) fn classify(self) -> Vec<Class> {
-
         let mut ret = vec![Class::Noise; self.data.len()];
         let mut cursor = DataIdx(0);
         let mut current_class_id = ClassId(0);
         while cursor < DataIdx(self.data.len()) {
-            dbg!(cursor.0);
             match self.is_core(cursor.0) {
                 None => {
                     cursor.0 += 1;
