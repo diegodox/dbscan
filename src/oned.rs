@@ -34,49 +34,38 @@ where
     F: PartialOrd,
 {
     pub(crate) fn classify(self) -> Vec<Class> {
-        let x: Vec<_> = (0..self.data.len()).map(|i| self.is_core(i)).collect();
 
         let mut ret = vec![Class::Noise; self.data.len()];
         let mut cursor = DataIdx(0);
         let mut current_class_id = ClassId(0);
         while cursor < DataIdx(self.data.len()) {
-            if x[cursor].is_none() {
-                cursor.0 += 1;
-                continue;
-            }
-            let k = x[cursor.0..].partition_point(|x| matches!(x, Some(r) if r.contains(&cursor)));
-            match k {
-                0 | 1 => {
+            dbg!(cursor.0);
+            match self.is_core(cursor.0) {
+                None => {
+                    cursor.0 += 1;
+                    continue;
+                }
+                Some(0 | 1) => {
                     cursor.0 += 1;
                     current_class_id.0 += 1;
                 }
-                2.. => {
+                Some(k) => {
                     ret[cursor.0..][..k]
                         .iter_mut()
                         .for_each(|i| *i = Class::Core(current_class_id));
                     cursor.0 += k - 1;
                 }
-                _ => unreachable!(),
             }
         }
         ret
     }
 
-    fn is_core(&self, i: usize) -> Option<std::ops::Range<DataIdx>> {
+    fn is_core(&self, i: usize) -> Option<usize> {
         let min = self.data[..=i]
             .partition_point(|x| (self.distance)(x, &self.data[i]) > self.param.epsilon);
-        debug_assert!(self.data[..min]
-            .iter()
-            .all(|x| (self.distance)(x, &self.data[i]) > self.param.epsilon));
         let max = self.data[i..]
             .partition_point(|x| (self.distance)(x, &self.data[i]) <= self.param.epsilon);
-        debug_assert!(self.data[i..][max..]
-            .iter()
-            .all(|x| (self.distance)(x, &self.data[i]) > self.param.epsilon));
-        debug_assert!(self.data[min..i + max]
-            .iter()
-            .all(|x| (self.distance)(x, &self.data[i]) <= self.param.epsilon));
-        (i + max - min >= self.param.min).then_some(DataIdx(min)..DataIdx(max + i))
+        (i + max - min >= self.param.min).then_some(max)
     }
 }
 
