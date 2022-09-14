@@ -89,7 +89,7 @@ mod tests {
         let model = DBScan::new(0.5, 3);
         let inputs = vec![0.3f64, 1.0, 1.2, 1.5, 3.6, 3.7, 3.9, 10.0];
 
-        let output = model.classify1d(&inputs, |a, b| (a - b).abs());
+        let output = model.oned_classify(&inputs, |a, b| (a - b).abs());
 
         assert_eq!(
             output,
@@ -119,16 +119,6 @@ impl<U: PartialOrd> SliceIsSortedEx for &[U] {
 }
 
 /// Checks if the elements of this iterator are sorted using the given comparator function.
-///
-/// # Examples
-///
-/// ```
-/// assert!(iter_is_sorted_by([1, 2, 2, 9].iter(), |a, b| a.partial_cmp(b));
-/// assert!(!iter_is_sorted_by([1, 3, 2, 4].iter(), |a, b| a.partial_cmp(b)));
-/// assert!(iter_is_sorted_by([0].iter(), |a, b| a.partial_cmp(b)));
-/// assert!(iter_is_sorted_by(std::iter::empty::<i32>(), |a, b| a.partial_cmp(b)));
-/// assert!(!iter_is_sorted_by([0.0, 1.0, f32::NAN].iter(), |a, b| a.partial_cmp(b)));
-/// ```
 fn iter_is_sorted_by<I, F>(mut iter: I, compare: F) -> bool
 where
     I: Iterator,

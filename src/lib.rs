@@ -21,7 +21,7 @@ impl<F: PartialOrd> DBScan<F> {
         nd::DBScanRunner::new(self, data, distance).classify()
     }
 
-    pub fn classify1d<T, DistFn>(
+    pub fn oned_classify<T, DistFn>(
         &self,
         data: &[T],
         distance: DistFn,
