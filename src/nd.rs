@@ -34,7 +34,7 @@ where
     DistFn: Fn(&T, &T) -> F,
     F: PartialOrd,
 {
-    pub fn classify(mut self) -> Vec<Class> {
+    pub fn classify(mut self) -> (Vec<Class>, ClassId) {
         let mut next_cluster = ClassId(0);
         for (idx, sample) in self.data_iter_enumerate() {
             let idx_is_visited = self.is_visited[idx];
@@ -49,7 +49,8 @@ where
                 };
             }
         }
-        self.class
+        next_cluster.0 -= 1;
+        (self.class, next_cluster)
     }
 
     fn range_query(&self, sample: &T) -> Vec<DataIdx> {
@@ -105,16 +106,19 @@ mod tests {
 
         assert_eq!(
             output,
-            vec![
-                Class::Edge(ClassId(0)),
-                Class::Core(ClassId(0)),
-                Class::Core(ClassId(0)),
-                Class::Core(ClassId(0)),
-                Class::Core(ClassId(1)),
-                Class::Core(ClassId(1)),
-                Class::Core(ClassId(1)),
-                Class::Noise
-            ]
+            (
+                vec![
+                    Class::Edge(ClassId(0)),
+                    Class::Core(ClassId(0)),
+                    Class::Core(ClassId(0)),
+                    Class::Core(ClassId(0)),
+                    Class::Core(ClassId(1)),
+                    Class::Core(ClassId(1)),
+                    Class::Core(ClassId(1)),
+                    Class::Noise
+                ],
+                ClassId(1)
+            )
         );
     }
 
@@ -159,12 +163,15 @@ mod tests {
         });
         assert_eq!(
             output,
-            vec![
-                Class::Core(ClassId(0)),
-                Class::Core(ClassId(0)),
-                Class::Edge(ClassId(0)),
-                Class::Edge(ClassId(0))
-            ]
+            (
+                vec![
+                    Class::Core(ClassId(0)),
+                    Class::Core(ClassId(0)),
+                    Class::Edge(ClassId(0)),
+                    Class::Edge(ClassId(0))
+                ],
+                ClassId(0)
+            )
         );
     }
 

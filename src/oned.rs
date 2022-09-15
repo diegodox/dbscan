@@ -33,7 +33,7 @@ where
     DistFn: Fn(&T, &T) -> F,
     F: PartialOrd,
 {
-    pub(crate) fn classify(self) -> Vec<Class> {
+    pub(crate) fn classify(self) -> (Vec<Class>, ClassId) {
         let mut ret = vec![Class::Noise; self.data.len()];
         let mut cursor = DataIdx(0);
         let mut current_class_id = ClassId(0);
@@ -55,7 +55,8 @@ where
                 }
             }
         }
-        ret
+        current_class_id.0 -= 1;
+        (ret, current_class_id)
     }
 
     fn is_core(&self, i: usize) -> Option<usize> {
@@ -80,16 +81,19 @@ mod tests {
 
         assert_eq!(
             output,
-            Ok(vec![
-                Class::Noise,
-                Class::Core(ClassId(0)),
-                Class::Core(ClassId(0)),
-                Class::Core(ClassId(0)),
-                Class::Core(ClassId(1)),
-                Class::Core(ClassId(1)),
-                Class::Core(ClassId(1)),
-                Class::Noise
-            ])
+            Ok((
+                vec![
+                    Class::Noise,
+                    Class::Core(ClassId(0)),
+                    Class::Core(ClassId(0)),
+                    Class::Core(ClassId(0)),
+                    Class::Core(ClassId(1)),
+                    Class::Core(ClassId(1)),
+                    Class::Core(ClassId(1)),
+                    Class::Noise
+                ],
+                ClassId(1)
+            ))
         );
     }
 }
