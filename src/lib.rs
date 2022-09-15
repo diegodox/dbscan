@@ -30,7 +30,8 @@ impl<F: PartialOrd> DBScan<F> {
         DistFn: Fn(&T, &T) -> F,
         T: PartialOrd,
     {
-        oned::DBScanRunner::new(self, data, distance).map(|x| x.classify())
+        let runner = oned::DBScanRunner::new(self, data, distance)?;
+        Ok(runner.classify())
     }
 }
 
