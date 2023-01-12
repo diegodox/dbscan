@@ -33,12 +33,13 @@ where
     DistFn: Fn(&T, &T) -> F,
     F: PartialOrd,
 {
+    /// Do classify
     pub(crate) fn classify(self) -> (Vec<Class>, ClassId) {
         let mut ret = vec![Class::Noise; self.data.len()];
         let mut cursor = DataIdx(0);
         let mut current_class_id = ClassId(0);
         while cursor < DataIdx(self.data.len()) {
-            match self.is_core(cursor.0) {
+            match self.distinct_core(cursor.0) {
                 None => {
                     cursor.0 += 1;
                     continue;
@@ -59,7 +60,9 @@ where
         (ret, current_class_id)
     }
 
-    fn is_core(&self, i: usize) -> Option<usize> {
+    /// Return Some(number of point in epsilon) if is core,
+    /// otherwise return None.
+    fn distinct_core(&self, i: usize) -> Option<usize> {
         let min = self.data[..=i]
             .partition_point(|x| (self.distance)(x, &self.data[i]) > self.param.epsilon);
         let max = self.data[i..]
