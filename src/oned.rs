@@ -44,7 +44,8 @@ where
                     cursor.0 += 1;
                     continue;
                 }
-                Some(0 | 1) => {
+                Some(0) => unreachable!(),
+                Some(1) => {
                     cursor.0 += 1;
                     current_class_id.0 += 1;
                 }
@@ -62,7 +63,7 @@ where
 
     /// Return Some(number of point in epsilon) if is core,
     /// otherwise return None.
-    fn distinct_core(&self, i: usize) -> Option<usize> {
+    pub fn distinct_core(&self, i: usize) -> Option<usize> {
         let min = self.data[..=i]
             .partition_point(|x| (self.distance)(x, &self.data[i]) > self.param.epsilon);
         let max = self.data[i..]
@@ -74,6 +75,34 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn distinct_core() {
+        let model = DBScan::new(0.5, 3);
+        let inputs = vec![0.3f64, 1.0, 1.2, 1.5, 3.6, 3.7, 3.9, 10.0];
+
+        let runner = DBScanRunner::new(&model, &inputs, |a: &f64, b: &f64| (a - b).abs()).unwrap();
+        assert_eq!(runner.distinct_core(0), None);
+        assert_eq!(runner.distinct_core(1), Some(3));
+        assert_eq!(runner.distinct_core(2), Some(2));
+        assert_eq!(runner.distinct_core(3), Some(1));
+
+        assert_eq!(runner.distinct_core(4), Some(3));
+        assert_eq!(runner.distinct_core(5), Some(2));
+        assert_eq!(runner.distinct_core(6), Some(1));
+
+        assert_eq!(runner.distinct_core(7), None);
+
+        for i in 0..inputs.len() {
+            let Some(max) = runner.distinct_core(i) else { continue; };
+            assert!(
+                inputs[i..][..max]
+                    .iter()
+                    .all(|x| (x - inputs[i]).abs() <= 0.5),
+                "{i}"
+            );
+        }
+    }
 
     #[test]
     fn cluster() {
