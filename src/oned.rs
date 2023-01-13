@@ -63,6 +63,15 @@ where
                     current_class_id.0 += 1;
                 }
                 Some(k) if k >= self.param.min => {
+                    match cursor
+                        .0
+                        .checked_sub(1)
+                        .and_then(|i| ret.get(i))
+                        .unwrap_or(&Class::Noise)
+                    {
+                        Class::Edge(i) if *i == current_class_id => current_class_id.0 += 1,
+                        _ => { /* do nothing */ }
+                    }
                     ret[cursor.0..][..k]
                         .iter_mut()
                         .for_each(|i| *i = Class::Core(current_class_id));
