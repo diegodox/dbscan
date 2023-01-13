@@ -56,7 +56,6 @@ where
             match self.distinct_core(cursor.0) {
                 None => {
                     cursor.0 += 1;
-                    continue;
                 }
                 Some(0) => unreachable!(),
                 Some(1) => {
