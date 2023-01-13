@@ -62,10 +62,17 @@ where
                     cursor.0 += 1;
                     current_class_id.0 += 1;
                 }
-                Some(k) => {
+                Some(k) if k >= self.param.min => {
                     ret[cursor.0..][..k]
                         .iter_mut()
                         .for_each(|i| *i = Class::Core(current_class_id));
+                    cursor.0 += k - 1;
+                }
+                Some(k) => {
+                    debug_assert!(k < self.param.min);
+                    ret[cursor.0..][..k]
+                        .iter_mut()
+                        .for_each(|i| *i = Class::Edge(current_class_id));
                     cursor.0 += k - 1;
                 }
             }
