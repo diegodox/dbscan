@@ -28,6 +28,20 @@ where
     }
 }
 
+impl<'p, 'd, T, F, DistFn> DBScanRunner<'p, 'd, T, F, DistFn> {
+    pub(crate) unsafe fn new_unchecked(
+        param: &'p DBScan<F>,
+        data: &'d [T],
+        distance: DistFn,
+    ) -> Self {
+        Self {
+            param,
+            data,
+            distance,
+        }
+    }
+}
+
 impl<F, T, DistFn> DBScanRunner<'_, '_, T, F, DistFn>
 where
     DistFn: Fn(&T, &T) -> F,

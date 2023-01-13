@@ -33,6 +33,21 @@ impl<F: PartialOrd> DBScan<F> {
         let runner = oned::DBScanRunner::new(self, data, distance)?;
         Ok(runner.classify())
     }
+
+    /// # Safety
+    ///
+    /// This function assume data is sorted.
+    pub unsafe fn oned_classify_unchecked<T, DistFn>(
+        &self,
+        data: &[T],
+        distance: DistFn,
+    ) -> (Vec<Class>, ClassId)
+    where
+        DistFn: Fn(&T, &T) -> F,
+    {
+        let runner = oned::DBScanRunner::new_unchecked(self, data, distance);
+        runner.classify()
+    }
 }
 
 #[derive(Debug, Clone, Default, Copy, Hash, PartialEq, Eq)]
