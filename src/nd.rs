@@ -34,7 +34,10 @@ where
     DistFn: Fn(&T, &T) -> F,
     F: PartialOrd,
 {
-    pub fn classify(mut self) -> (Vec<Class>, ClassId) {
+    pub fn classify(mut self) -> (Vec<Class>, Option<ClassId>) {
+        if self.data.is_empty() {
+            return (Vec::new(), None);
+        }
         let mut next_cluster = ClassId(0);
         for (idx, sample) in self.data_iter_enumerate() {
             let idx_is_visited = self.is_visited[idx];
@@ -50,7 +53,7 @@ where
             }
         }
         next_cluster.0 -= 1;
-        (self.class, next_cluster)
+        (self.class, Some(next_cluster))
     }
 
     fn range_query(&self, sample: &T) -> Vec<DataIdx> {
@@ -117,7 +120,7 @@ mod tests {
                     Class::Core(ClassId(1)),
                     Class::Noise
                 ],
-                ClassId(1)
+                Some(ClassId(1))
             )
         );
     }
@@ -170,7 +173,7 @@ mod tests {
                     Class::Edge(ClassId(0)),
                     Class::Edge(ClassId(0))
                 ],
-                ClassId(0)
+                Some(ClassId(0))
             )
         );
     }

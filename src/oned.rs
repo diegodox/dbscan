@@ -48,7 +48,10 @@ where
     F: PartialOrd,
 {
     /// Do classify
-    pub(crate) fn classify(self) -> (Vec<Class>, ClassId) {
+    pub(crate) fn classify(self) -> (Vec<Class>, Option<ClassId>) {
+        if self.data.is_empty() {
+            return (Vec::new(), None);
+        }
         let mut ret = vec![Class::Noise; self.data.len()];
         let mut cursor = DataIdx(0);
         let mut current_class_id = ClassId(0);
@@ -87,7 +90,7 @@ where
             }
         }
         current_class_id.0 -= 1;
-        (ret, current_class_id)
+        (ret, Some(current_class_id))
     }
 
     /// Return Some(number of point in epsilon) if is core,
@@ -153,7 +156,7 @@ mod tests {
                     Class::Core(ClassId(1)),
                     Class::Noise
                 ],
-                ClassId(1)
+                Some(ClassId(1))
             ))
         );
     }

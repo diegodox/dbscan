@@ -14,7 +14,7 @@ impl<F: PartialOrd> DBScan<F> {
         Self { epsilon, min }
     }
 
-    pub fn classify<T, DistFn>(&self, data: &[T], distance: DistFn) -> (Vec<Class>, ClassId)
+    pub fn classify<T, DistFn>(&self, data: &[T], distance: DistFn) -> (Vec<Class>, Option<ClassId>)
     where
         DistFn: Fn(&T, &T) -> F,
     {
@@ -25,7 +25,7 @@ impl<F: PartialOrd> DBScan<F> {
         &self,
         data: &[T],
         distance: DistFn,
-    ) -> Result<(Vec<Class>, ClassId), DBScanError>
+    ) -> Result<(Vec<Class>, Option<ClassId>), DBScanError>
     where
         DistFn: Fn(&T, &T) -> F,
         T: PartialOrd,
@@ -41,7 +41,7 @@ impl<F: PartialOrd> DBScan<F> {
         &self,
         data: &[T],
         distance: DistFn,
-    ) -> (Vec<Class>, ClassId)
+    ) -> (Vec<Class>, Option<ClassId>)
     where
         DistFn: Fn(&T, &T) -> F,
     {
