@@ -52,45 +52,31 @@ where
         if self.data.is_empty() {
             return (Vec::new(), None);
         }
+
         let mut ret = vec![Class::Noise; self.data.len()];
-        let mut cursor = DataIdx(0);
+        let mut is_cont = true;
         let mut current_class_id = ClassId(0);
-        while cursor < DataIdx(self.data.len()) {
+        for cursor in (0..self.data.len()).map(DataIdx) {
             match self.distinct_core(cursor.0) {
-                None => {
-                    cursor.0 += 1;
-                }
                 Some(0) => unreachable!(),
-                Some(1) => {
-                    cursor.0 += 1;
+                Some(k) if k >= self.param.min => {
+                    is_cont = true;
+                    ret[cursor.0] = Class::Core(current_class_id);
+                }
+                _ if is_cont => {
+                    is_cont = false;
                     current_class_id.0 += 1;
                 }
-                Some(k) if k >= self.param.min => {
-                    match cursor
-                        .0
-                        .checked_sub(1)
-                        .and_then(|i| ret.get(i))
-                        .unwrap_or(&Class::Noise)
-                    {
-                        Class::Edge(i) if *i == current_class_id => current_class_id.0 += 1,
-                        _ => { /* do nothing */ }
-                    }
-                    ret[cursor.0..][..k]
-                        .iter_mut()
-                        .for_each(|i| *i = Class::Core(current_class_id));
-                    cursor.0 += k - 1;
-                }
-                Some(k) => {
-                    debug_assert!(k < self.param.min);
-                    ret[cursor.0..][..k]
-                        .iter_mut()
-                        .for_each(|i| *i = Class::Edge(current_class_id));
-                    cursor.0 += k - 1;
+                _ => {
+                    debug_assert!(!is_cont);
                 }
             }
         }
-        current_class_id.0 -= 1;
-        (ret, Some(current_class_id))
+
+        let max_class = (!is_cont)
+            .then_some(ClassId(current_class_id.0 - 1))
+            .or_else(|| current_class_id.0.checked_sub(1).map(ClassId));
+        (ret, max_class)
     }
 
     /// Return Some(number of point in epsilon) if is core,
