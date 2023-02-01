@@ -54,7 +54,7 @@ where
         }
 
         let mut ret = vec![Class::Noise; self.data.len()];
-        let mut is_cont = false;
+        let mut is_cont = true;
         let mut current_class_id = ClassId(0);
         for cursor in (0..self.data.len()).map(DataIdx) {
             match self.distinct_core(cursor.0) {
