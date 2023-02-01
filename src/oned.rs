@@ -54,7 +54,7 @@ where
         }
 
         let mut ret = vec![Class::Noise; self.data.len()];
-        let mut is_cont = true;
+        let mut is_cont = false;
         let mut current_class_id = ClassId(0);
         for cursor in (0..self.data.len()).map(DataIdx) {
             match self.distinct_core(cursor.0) {
@@ -73,9 +73,11 @@ where
             }
         }
 
-        let max_class = (!is_cont)
-            .then_some(ClassId(current_class_id.0 - 1))
-            .or_else(|| current_class_id.0.checked_sub(1).map(ClassId));
+        let max_class = if is_cont {
+            Some(current_class_id)
+        } else {
+            current_class_id.0.checked_sub(1).map(ClassId)
+        };
         (ret, max_class)
     }
 
