@@ -5,8 +5,8 @@ mod oned;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct DBScan<F> {
-    epsilon: F,
-    min: usize,
+    pub epsilon: F,
+    pub min: usize,
 }
 
 impl<F: PartialOrd> DBScan<F> {
