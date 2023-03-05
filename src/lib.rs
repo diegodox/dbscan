@@ -10,7 +10,7 @@ pub struct DBScan<F> {
 }
 
 impl<F: PartialOrd> DBScan<F> {
-    pub fn new(epsilon: F, min: usize) -> Self {
+    pub const fn new(epsilon: F, min: usize) -> Self {
         Self { epsilon, min }
     }
 
