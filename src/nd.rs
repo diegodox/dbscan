@@ -1,5 +1,6 @@
 use crate::{Class, ClassId, DBScan, DataIdx};
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct DBScanRunner<'p, 'd, T, F, DistFn> {
     param: &'p DBScan<F>,
     class: Vec<Class>,

@@ -3,7 +3,7 @@
 mod nd;
 mod oned;
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
 pub struct DBScan<F> {
     pub epsilon: F,
     pub min: usize,
